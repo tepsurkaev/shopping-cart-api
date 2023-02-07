@@ -7,7 +7,7 @@ mongoose.set('strictQuery', true);
 
 const app = express();
 
-const { PORT, DB_URI } = process.env;
+const { PORT = 3030, DB_URI = '' } = process.env;
 
 app.use(express.json());
 app.use(cors());
