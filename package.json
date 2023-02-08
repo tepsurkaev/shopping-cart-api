@@ -5,7 +5,7 @@
   "author": "Hamza Tepsurkaev",
   "license": "MIT",
   "scripts": {
-    "start": "nodemon ./src",
+    "start": "nodemon ./src/index -q",
     "prettier": "prettier ./src --write",
     "prettier:check": "prettier ./src --check",
     "linter": "eslint ./src --ext .js --fix",
@@ -18,8 +18,10 @@
     "cors": "^2.8.5",
     "dotenv": "^16.0.3",
     "express": "^4.18.2",
+    "express-validator": "^6.14.3",
     "jsonwebtoken": "^9.0.0",
-    "mongoose": "^6.9.1"
+    "mongoose": "^6.9.1",
+    "multer": "^1.4.5-lts.1"
   },
   "devDependencies": {
     "eslint": "^8.0.1",

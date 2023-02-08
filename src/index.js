@@ -10,6 +10,7 @@ const app = express();
 const { PORT = 3030, DB_URI = '' } = process.env;
 
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 app.use(cors());
 
 (async function () {
