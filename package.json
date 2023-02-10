@@ -12,7 +12,7 @@
     "linter:check": "eslint ./src --ext .js --report-unused-disable-directives --max-warnings 0",
     "precommit": "yarn prettier:check && yarn linter:check"
   },
-  "type": "module",
+  "type": "commonjs",
   "dependencies": {
     "bcrypt": "^5.1.0",
     "cors": "^2.8.5",
@@ -29,6 +29,7 @@
     "eslint-plugin-import": "^2.25.2",
     "eslint-plugin-n": "^15.0.0",
     "eslint-plugin-promise": "^6.0.0",
+    "morgan": "^1.10.0",
     "nodemon": "^2.0.20",
     "prettier": "^2.8.3"
   }

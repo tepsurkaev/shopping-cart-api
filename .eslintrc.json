@@ -12,6 +12,8 @@
     },
     "rules": {
         "no-console": "error",
-        "semi": "off"
+        "semi": "off",
+        "comma-dangle": "off",
+        "space-before-function-paren": "off"
     }
 }
