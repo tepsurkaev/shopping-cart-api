@@ -3,9 +3,35 @@ const Product = require('../models/Product.model');
 class ProductsController {
   async getAllProducts(req, res, next) {
     try {
-      const products = await Product.find();
+      const { limit = 30 } = req.query;
 
-      return res.status(200).json(products);
+      const collectionCount = await Product.countDocuments();
+      const totalPages = Math.ceil(collectionCount / limit);
+      const products = await Product.find().limit(limit);
+
+      return res.status(200).json({
+        collection: products,
+        metadata: {
+          page: 1,
+          limit,
+          totalPages,
+          collectionCount
+        }
+      });
+    } catch (e) {
+      next(e);
+    }
+  }
+
+  async searchProducts(req, res, next) {
+    try {
+      const { query } = req.query;
+      const searchPattern = new RegExp(query, 'i');
+      const searchedProducts = await Product.find({
+        name: { $regex: searchPattern }
+      });
+
+      return res.status(200).json(searchedProducts);
     } catch (e) {
       next(e);
     }
@@ -16,6 +42,10 @@ class ProductsController {
       const { id } = req.params;
       const product = await Product.findById(id);
 
+      if (!product) {
+        return res.status(404).send('Товар не найден!');
+      }
+
       return res.status(200).json(product);
     } catch (e) {
       next(e);
@@ -24,12 +54,13 @@ class ProductsController {
 
   async createNewProduct(req, res, next) {
     try {
-      const { name, price, category, subcategory } = req.body;
+      const { name, price, category, subcategory, type } = req.body;
       const newProduct = await Product.create({
         name,
         price,
         category,
-        subcategory
+        subcategory,
+        type
       });
 
       return res.status(200).json(newProduct);
@@ -41,7 +72,15 @@ class ProductsController {
   async updateProductById(req, res, next) {
     try {
       const { id } = req.params;
-      const product = await Product.findByIdAndUpdate(id, ...req.body);
+
+      const product = await Product.findById(id);
+
+      if (!product) {
+        return res.status(404).send('Товар не найден!');
+      }
+
+      Object.assign(product, req.body);
+      await product.save();
 
       return res.status(200).json(product);
     } catch (e) {
@@ -52,9 +91,16 @@ class ProductsController {
   async deleteProductById(req, res, next) {
     try {
       const { id } = req.params;
-      const product = await Product.findByIdAndDelete(id);
 
-      return res.status(200).json(product);
+      const product = await Product.findById(id);
+
+      if (!product) {
+        return res.status(404).send('Товар не найден!');
+      }
+
+      const deletedProduct = await Product.findByIdAndDelete(id);
+
+      return res.status(200).json(deletedProduct);
     } catch (e) {
       next(e);
     }

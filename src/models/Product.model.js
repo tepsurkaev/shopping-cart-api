@@ -11,11 +11,15 @@ const productSchema = new Schema(
       required: true
     },
     category: {
-      type: Number,
+      type: String,
       required: true
     },
     subcategory: {
-      type: Number,
+      type: String,
+      required: true
+    },
+    type: {
+      type: String,
       required: true
     },
     images: [String]
