@@ -1,13 +1,37 @@
 const Product = require('../models/Product.model');
 
+// need to devide the business logic and http requests
+// create a service folder to hold business logic
 class ProductsController {
   async getAllProducts(req, res, next) {
     try {
-      const { limit = 30 } = req.query;
+      const { limit = 30, category, subcategory, from, to } = req.query;
 
-      const collectionCount = await Product.countDocuments();
+      const query = {};
+
+      if (category) {
+        query.category = category;
+      }
+
+      if (subcategory) {
+        query.subcategory = subcategory;
+      }
+
+      if (from) {
+        query.price = { $gte: from };
+      }
+
+      if (to) {
+        if (query.price) {
+          query.price.$lte = to;
+        } else {
+          query.price = { $lte: to };
+        }
+      }
+
+      const collectionCount = await Product.find(query).countDocuments();
       const totalPages = Math.ceil(collectionCount / limit);
-      const products = await Product.find().limit(limit);
+      const products = await Product.find(query).limit(limit);
 
       return res.status(200).json({
         collection: products,
