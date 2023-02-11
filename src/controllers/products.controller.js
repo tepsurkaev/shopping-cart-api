@@ -1,42 +1,39 @@
 const Product = require('../models/Product.model');
+const { queryParams } = require('../services/queryParams');
+const { pagination } = require('../services/pagination');
+const { documentsCount } = require('../services/documentsCount');
+const {
+  searchedDocumentsCount
+} = require('../services/searchedDocumentsCount');
 
-// need to devide the business logic and http requests
-// create a service folder to hold business logic
 class ProductsController {
   async getAllProducts(req, res, next) {
     try {
-      const { limit = 30, category, subcategory, from, to } = req.query;
+      const {
+        limit = 30,
+        page = 1,
+        category,
+        subcategory,
+        from,
+        to
+      } = req.query;
 
-      const query = {};
+      const skip = pagination(page, limit);
+      const { collectionCount, totalPages } = await documentsCount(
+        Product,
+        limit
+      );
 
-      if (category) {
-        query.category = category;
-      }
-
-      if (subcategory) {
-        query.subcategory = subcategory;
-      }
-
-      if (from) {
-        query.price = { $gte: from };
-      }
-
-      if (to) {
-        if (query.price) {
-          query.price.$lte = to;
-        } else {
-          query.price = { $lte: to };
-        }
-      }
-
-      const collectionCount = await Product.find(query).countDocuments();
-      const totalPages = Math.ceil(collectionCount / limit);
-      const products = await Product.find(query).limit(limit);
+      const products = await Product.find(
+        queryParams(from, to, category, subcategory)
+      )
+        .skip(skip)
+        .limit(limit);
 
       return res.status(200).json({
         collection: products,
         metadata: {
-          page: 1,
+          page,
           limit,
           totalPages,
           collectionCount
@@ -49,13 +46,42 @@ class ProductsController {
 
   async searchProducts(req, res, next) {
     try {
-      const { query } = req.query;
-      const searchPattern = new RegExp(query, 'i');
-      const searchedProducts = await Product.find({
-        name: { $regex: searchPattern }
-      });
+      const {
+        limit = 30,
+        page = 1,
+        query,
+        category,
+        subcategory,
+        from,
+        to
+      } = req.query;
 
-      return res.status(200).json(searchedProducts);
+      if (!query) {
+        return res.send('Необходимо передать искомое значение!');
+      }
+
+      const skip = pagination(page, limit);
+
+      const searchedProducts = await Product.find(
+        queryParams(from, to, category, subcategory, query)
+      )
+        .skip(skip)
+        .limit(limit);
+
+      const { collectionCount, totalPages } = searchedDocumentsCount(
+        searchedProducts,
+        limit
+      );
+
+      return res.status(200).json({
+        collection: searchedProducts,
+        metadata: {
+          page,
+          limit,
+          totalPages,
+          collectionCount
+        }
+      });
     } catch (e) {
       next(e);
     }
