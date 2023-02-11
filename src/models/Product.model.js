@@ -4,14 +4,27 @@ const productSchema = new Schema(
   {
     name: {
       type: String,
-      required: true,
+      required: true
     },
     price: {
       type: Number,
-      required: true,
+      required: true
     },
+    category: {
+      type: String,
+      required: true
+    },
+    subcategory: {
+      type: String,
+      required: true
+    },
+    type: {
+      type: String,
+      required: true
+    },
+    images: [String]
   },
-  { timeseries: { createdAt: true, updatedAt: false } }
+  { timestamps: { createdAt: true, updatedAt: false } }
 );
 
 const Product = model('Product', productSchema);
