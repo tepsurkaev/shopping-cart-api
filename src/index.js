@@ -4,6 +4,7 @@ const cors = require('cors');
 const mongoose = require('mongoose');
 const morgan = require('morgan');
 const indexRouter = require('./routes/index');
+const errorMiddleware = require('./middlewares/error.middleware');
 
 mongoose.set('strictQuery', true);
 
@@ -16,6 +17,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cors());
 app.use(morgan('dev'));
 app.use(indexRouter);
+app.use(errorMiddleware);
 
 (async function () {
   try {
