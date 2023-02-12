@@ -1,5 +1,5 @@
-module.exports.documentsCount = async (model, limit) => {
-  const collectionCount = await model.find().countDocuments();
+module.exports.documentsCount = (collection, limit) => {
+  const collectionCount = collection.length;
   const totalPages = Math.ceil(collectionCount / limit);
 
   return {
