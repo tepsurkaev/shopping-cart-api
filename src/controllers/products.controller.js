@@ -1,10 +1,8 @@
 const Product = require('../models/Product.model');
-const { queryParams } = require('../services/queryParams');
-const { pagination } = require('../services/pagination');
-const { documentsCount } = require('../services/documentsCount');
-const {
-  searchedDocumentsCount
-} = require('../services/searchedDocumentsCount');
+const { queryParams } = require('../utils/queryParams');
+const { pagination } = require('../utils/pagination');
+const { documentsCount } = require('../utils/documentsCount');
+const { searchedDocumentsCount } = require('../utils/searchedDocumentsCount');
 
 class ProductsController {
   async getAllProducts(req, res, next) {
