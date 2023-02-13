@@ -1,8 +1,4 @@
-const Product = require('../models/Product.model');
-const { queryParams } = require('../utils/queryParams');
-const { pagination } = require('../utils/pagination');
-const { documentsCount } = require('../utils/documentsCount');
-const { searchedDocumentsCount } = require('../utils/searchedDocumentsCount');
+const productService = require('../services/product.service');
 
 class ProductsController {
   async getAllProducts(req, res, next) {
@@ -16,20 +12,20 @@ class ProductsController {
         to
       } = req.query;
 
-      const skip = pagination(page, limit);
-      const { collectionCount, totalPages } = await documentsCount(
-        Product,
-        limit
-      );
-
-      const products = await Product.find(
-        queryParams(from, to, category, subcategory)
-      )
-        .skip(skip)
-        .limit(limit);
+      const { products, collectionCount, totalPages } =
+        await productService.getAllProducts({
+          limit,
+          page,
+          category,
+          subcategory,
+          from,
+          to
+        });
 
       return res.status(200).json({
-        collection: products,
+        status: 200,
+        message: 'Товары успешно получены!',
+        products,
         metadata: {
           page,
           limit,
@@ -54,25 +50,21 @@ class ProductsController {
         to
       } = req.query;
 
-      if (!query) {
-        return res.send('Необходимо передать искомое значение!');
-      }
-
-      const skip = pagination(page, limit);
-
-      const searchedProducts = await Product.find(
-        queryParams(from, to, category, subcategory, query)
-      )
-        .skip(skip)
-        .limit(limit);
-
-      const { collectionCount, totalPages } = searchedDocumentsCount(
-        searchedProducts,
-        limit
-      );
+      const { searchedProducts, collectionCount, totalPages } =
+        await productService.searchProducts({
+          limit,
+          page,
+          query,
+          category,
+          subcategory,
+          from,
+          to
+        });
 
       return res.status(200).json({
-        collection: searchedProducts,
+        status: 200,
+        message: 'Товары успешно получены!',
+        products: searchedProducts,
         metadata: {
           page,
           limit,
@@ -88,13 +80,12 @@ class ProductsController {
   async getProductById(req, res, next) {
     try {
       const { id } = req.params;
-      const product = await Product.findById(id);
 
-      if (!product) {
-        return res.status(404).send('Товар не найден!');
-      }
+      const product = await productService.getProductById(id);
 
-      return res.status(200).json(product);
+      return res
+        .status(200)
+        .json({ status: 200, message: 'Товар успешно получен!', product });
     } catch (e) {
       next(e);
     }
@@ -102,16 +93,11 @@ class ProductsController {
 
   async createNewProduct(req, res, next) {
     try {
-      const { name, price, category, subcategory, type } = req.body;
-      const newProduct = await Product.create({
-        name,
-        price,
-        category,
-        subcategory,
-        type
-      });
+      const newProduct = await productService.createNewProduct(req.body);
 
-      return res.status(200).json(newProduct);
+      return res
+        .status(200)
+        .json({ status: 200, message: 'Товар успешно добавлен!', newProduct });
     } catch (e) {
       next(e);
     }
@@ -121,16 +107,16 @@ class ProductsController {
     try {
       const { id } = req.params;
 
-      const product = await Product.findById(id);
+      const updatedProduct = await productService.updateProductById(
+        id,
+        req.body
+      );
 
-      if (!product) {
-        return res.status(404).send('Товар не найден!');
-      }
-
-      Object.assign(product, req.body);
-      await product.save();
-
-      return res.status(200).json(product);
+      return res.status(200).json({
+        status: 200,
+        message: 'Товар успешно изменён!',
+        updatedProduct
+      });
     } catch (e) {
       next(e);
     }
@@ -140,15 +126,13 @@ class ProductsController {
     try {
       const { id } = req.params;
 
-      const product = await Product.findById(id);
+      const deletedProduct = await productService.deleteProductById(id);
 
-      if (!product) {
-        return res.status(404).send('Товар не найден!');
-      }
-
-      const deletedProduct = await Product.findByIdAndDelete(id);
-
-      return res.status(200).json(deletedProduct);
+      return res.status(200).json({
+        status: 200,
+        message: 'Товар успешно удалён!',
+        deletedProduct
+      });
     } catch (e) {
       next(e);
     }
