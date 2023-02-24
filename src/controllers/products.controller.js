@@ -1,4 +1,5 @@
 const productService = require('../services/product.service');
+const userService = require('../services/user.service');
 
 class ProductsController {
   async getAllProducts(req, res, next) {
@@ -93,6 +94,8 @@ class ProductsController {
 
   async createNewProduct(req, res, next) {
     try {
+      await userService.isAdmin(req.user.id);
+
       const newProduct = await productService.createNewProduct(req.body);
 
       return res
@@ -106,6 +109,8 @@ class ProductsController {
   async updateProductById(req, res, next) {
     try {
       const { id } = req.params;
+
+      await userService.isAdmin(req.user.id);
 
       const updatedProduct = await productService.updateProductById(
         id,
@@ -125,6 +130,8 @@ class ProductsController {
   async deleteProductById(req, res, next) {
     try {
       const { id } = req.params;
+
+      await userService.isAdmin(req.user.id);
 
       const deletedProduct = await productService.deleteProductById(id);
 

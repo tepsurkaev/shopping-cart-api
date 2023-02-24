@@ -9,7 +9,7 @@ class CartsController {
 
       return res
         .status(200)
-        .json({ status: 200, message: 'Корзина успешно получена!', cart });
+        .json({ status: 200, message: 'Корзина успешно получена!', ...cart });
     } catch (e) {
       next(e);
     }
@@ -64,6 +64,34 @@ class CartsController {
         status: 200,
         message: 'Корзина успешно очищена!'
       });
+    } catch (e) {
+      next(e);
+    }
+  }
+
+  async increaseCartProductQuantity(req, res, next) {
+    try {
+      const { userId, productId } = req.params;
+
+      await cartService.increaseCartProductQuantity(userId, productId);
+
+      return res
+        .status(200)
+        .json({ status: 200, message: 'Кол-во успешно увеличено!' });
+    } catch (e) {
+      next(e);
+    }
+  }
+
+  async decreaseCartProductQuantity(req, res, next) {
+    try {
+      const { userId, productId } = req.params;
+
+      await cartService.decreaseCartProductQuantity(userId, productId);
+
+      return res
+        .status(200)
+        .json({ status: 200, message: 'Кол-во успешно уменшено!' });
     } catch (e) {
       next(e);
     }

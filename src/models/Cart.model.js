@@ -19,15 +19,7 @@ const cartSchema = new Schema({
         required: true
       }
     }
-  ],
-  totalProducts: {
-    type: Number,
-    default: 0
-  },
-  totalPrice: {
-    type: Number,
-    default: 0
-  }
+  ]
 });
 
 const Cart = model('Cart', cartSchema);

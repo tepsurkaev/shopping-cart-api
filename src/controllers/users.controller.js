@@ -30,6 +30,20 @@ class UsersController {
       next(e);
     }
   }
+
+  async getAuthedUser(req, res, next) {
+    try {
+      const userId = req.user.id;
+
+      const user = await userService.getAuthedUser(userId);
+
+      return res
+        .status(200)
+        .json({ status: 200, message: 'Пользователь получен!', user });
+    } catch (e) {
+      next(e);
+    }
+  }
 }
 
 const usersController = new UsersController();
