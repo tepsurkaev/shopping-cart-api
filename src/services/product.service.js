@@ -2,21 +2,39 @@ const Product = require('../models/Product.model');
 const BadRequestHandler = require('../errors/BadRequestHandler');
 const { queryParams } = require('../utils/queryParams');
 const { pagination } = require('../utils/pagination');
-const { documentsCount } = require('../utils/documentsCount');
 
 class ProductService {
+  async isProductAvailable(productId) {
+    const product = await Product.findById(productId);
+
+    if (!product) {
+      throw new BadRequestHandler(404, 'Товар не найден!');
+    }
+
+    return product.amount > 0;
+  }
+
+  async increaseProductAmount(productId) {
+    await Product.updateOne({ _id: productId }, { $inc: { amount: +1 } });
+  }
+
+  async decreaseProductAmount(productId) {
+    await Product.updateOne({ _id: productId }, { $inc: { amount: -1 } });
+  }
+
   async getAllProducts(query) {
     const { limit, page, category, subcategory, from, to } = query;
 
     const skip = pagination(page, limit);
+
+    const collectionCount = await Product.find().countDocuments();
+    const totalPages = Math.ceil(collectionCount / limit);
 
     const products = await Product.find(
       queryParams(from, to, category, subcategory)
     )
       .skip(skip)
       .limit(limit);
-
-    const { collectionCount, totalPages } = documentsCount(products, limit);
 
     return { products, collectionCount, totalPages };
   }
@@ -36,10 +54,8 @@ class ProductService {
       .skip(skip)
       .limit(limit);
 
-    const { collectionCount, totalPages } = documentsCount(
-      searchedProducts,
-      limit
-    );
+    const collectionCount = searchedProducts.length;
+    const totalPages = Math.ceil(collectionCount / limit);
 
     return { searchedProducts, collectionCount, totalPages };
   }
@@ -55,15 +71,7 @@ class ProductService {
   }
 
   async createNewProduct(data) {
-    const { name, price, category, subcategory, type } = data;
-
-    const newProduct = await Product.create({
-      name,
-      price,
-      category,
-      subcategory,
-      type
-    });
+    const newProduct = await Product.create(data);
 
     return newProduct;
   }
@@ -81,6 +89,7 @@ class ProductService {
     return product;
   }
 
+  // Получение для проверки на наличие может не быть лишнем, проверить без получение по id
   async deleteProductById(id) {
     const product = await Product.findById(id);
 

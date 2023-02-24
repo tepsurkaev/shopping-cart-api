@@ -23,6 +23,24 @@ class UserService {
     return token;
   }
 
+  async isAdmin(userId) {
+    const user = await User.findById(userId);
+
+    if (user.role !== 'admin') {
+      throw new BadRequestHandler(400, 'Нет прав доступа!');
+    }
+  }
+
+  async getAuthedUser(userId) {
+    const user = await User.findById(userId);
+
+    if (!user) {
+      throw new BadRequestHandler(404, 'Профиль не найден!');
+    }
+
+    return user;
+  }
+
   async registration(email, password) {
     const hashed = await this.hashPassword(password);
     const registered = await User.create({ email, password: hashed });
