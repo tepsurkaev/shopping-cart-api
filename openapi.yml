@@ -1,0 +1,35 @@
+openapi: 3.1.0
+info:
+  title: An openapi for shopping card client
+  description: This API allows to manipulate with shopping cart.
+  version: 1.0.0
+paths:
+  /profile:
+    get:
+      summury: Получение профиля пользователя.
+      desription: Получение профиля авторизованного пользователя.
+      responses:
+        '200':
+          desription: Профиля пользователя полученен!
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status: 200
+                  message: Пользователь получен!
+                  user:
+                    _id: 24b4052f3f9cfb9ce172exfa
+                    email: test@mail.ru
+                    role: customer
+        '404':
+          desription: Профиль пользователя не найден!.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status: 404
+                  message: Профиль не найден!
+  /registration:
+  /login:

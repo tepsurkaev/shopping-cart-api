@@ -32,7 +32,7 @@ class UserService {
   }
 
   async getAuthedUser(userId) {
-    const user = await User.findById(userId);
+    const user = await User.findById(userId).select(['-__v', '-password']);
 
     if (!user) {
       throw new BadRequestHandler(404, 'Профиль не найден!');
